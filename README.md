@@ -1,6 +1,8 @@
 # Which U.S. Counties Beat the Odds on Life Expectancy?
 
-**Live demo:** https://aryaharsh5559.github.io/us-county-health-map/
+[![View the live site](https://img.shields.io/badge/View%20the%20live%20site-%E2%86%92-2ea44f?style=for-the-badge)](https://aryaharsh5559.github.io/us-county-health-map/)
+
+**Live site:** [aryaharsh5559.github.io/us-county-health-map/](https://aryaharsh5559.github.io/us-county-health-map/)
 
 Richer counties live longer; that part is well known. This interactive D3.js map asks the more useful question: **which counties live much longer, or much shorter, than their income and access to care would predict?** A model trained on socioeconomic data alone predicts each county's life expectancy, and the map shows the gap between actual and predicted for 3,060 U.S. counties.
 
