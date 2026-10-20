@@ -1,0 +1,112 @@
+{
+  "year": 2024,
+  "model": "Gradient boosting, 3 socioeconomic features",
+  "features": [
+    "median household income (log)",
+    "uninsured rate",
+    "primary care physicians per 100k (log)"
+  ],
+  "out_of_fold_r2": 0.576,
+  "mae_years": 1.71,
+  "threshold_years": 2.0,
+  "counties": 3060,
+  "above": 491,
+  "expected": 2105,
+  "below": 464,
+  "peer_medians_by_income_decile": {
+    "1": {
+      "adult_smoking": 21.8,
+      "adult_obesity": 42.8,
+      "physical_inactivity": 34.5,
+      "diabetes": 16.0,
+      "excessive_drinking": 14.3,
+      "poor_health": 27.6
+    },
+    "2": {
+      "adult_smoking": 20.4,
+      "adult_obesity": 40.9,
+      "physical_inactivity": 31.6,
+      "diabetes": 14.4,
+      "excessive_drinking": 15.6,
+      "poor_health": 24.6
+    },
+    "3": {
+      "adult_smoking": 19.3,
+      "adult_obesity": 39.7,
+      "physical_inactivity": 29.5,
+      "diabetes": 13.2,
+      "excessive_drinking": 16.8,
+      "poor_health": 22.3
+    },
+    "4": {
+      "adult_smoking": 18.4,
+      "adult_obesity": 38.8,
+      "physical_inactivity": 28.4,
+      "diabetes": 12.8,
+      "excessive_drinking": 17.3,
+      "poor_health": 21.4
+    },
+    "5": {
+      "adult_smoking": 17.7,
+      "adult_obesity": 38.5,
+      "physical_inactivity": 27.4,
+      "diabetes": 12.1,
+      "excessive_drinking": 17.6,
+      "poor_health": 19.9
+    },
+    "6": {
+      "adult_smoking": 17.2,
+      "adult_obesity": 38.2,
+      "physical_inactivity": 26.3,
+      "diabetes": 11.7,
+      "excessive_drinking": 18.3,
+      "poor_health": 19.0
+    },
+    "7": {
+      "adult_smoking": 16.4,
+      "adult_obesity": 37.7,
+      "physical_inactivity": 25.3,
+      "diabetes": 11.2,
+      "excessive_drinking": 18.7,
+      "poor_health": 18.2
+    },
+    "8": {
+      "adult_smoking": 15.8,
+      "adult_obesity": 36.8,
+      "physical_inactivity": 24.2,
+      "diabetes": 11.0,
+      "excessive_drinking": 19.0,
+      "poor_health": 17.3
+    },
+    "9": {
+      "adult_smoking": 15.2,
+      "adult_obesity": 35.9,
+      "physical_inactivity": 23.5,
+      "diabetes": 10.7,
+      "excessive_drinking": 19.0,
+      "poor_health": 16.8
+    },
+    "10": {
+      "adult_smoking": 12.1,
+      "adult_obesity": 32.4,
+      "physical_inactivity": 20.3,
+      "diabetes": 9.7,
+      "excessive_drinking": 19.0,
+      "poor_health": 14.7
+    }
+  },
+  "compared": {
+    "Linear regression, income only": {
+      "r2": 0.528,
+      "mae": 1.84
+    },
+    "Linear regression, 3 socioeconomic features": {
+      "r2": 0.539,
+      "mae": 1.8
+    },
+    "Gradient boosting, 3 socioeconomic features": {
+      "r2": 0.576,
+      "mae": 1.71
+    }
+  }
+}

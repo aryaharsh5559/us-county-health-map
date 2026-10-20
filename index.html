@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Which Counties Beat the Odds?</title>
+    <meta name="description" content="Interactive map of U.S. counties whose life expectancy beats or misses what their income and access to care predict.">
+    <meta name="author" content="Harsh Arya">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Which U.S. Counties Beat the Odds on Life Expectancy?</h1>
+            <p class="subtitle">Each county's life expectancy compared with what its income, insurance coverage and access to doctors predict (2024)</p>
+        </header>
+
+        <div class="controls-panel">
+            <div class="control-group" style="display: none;">
+                <label for="year-slider">Year:</label>
+                <input type="range" id="year-slider" min="2024" max="2024" value="2024" step="1">
+                <span id="year-display">2024</span>
+            </div>
+
+            <div class="view-toggle" role="group" aria-label="Map view">
+                <button type="button" class="view-btn active" data-view="deviation" aria-pressed="true">Beat the odds</button>
+                <button type="button" class="view-btn" data-view="metric" aria-pressed="false">Explore a metric</button>
+            </div>
+
+            <div class="control-group" id="category-group">
+                <label for="category-filter">Show:</label>
+                <select id="category-filter">
+                    <option value="all" selected>All counties</option>
+                    <option value="above">Living longer than predicted</option>
+                    <option value="expected">Close to prediction</option>
+                    <option value="below">Living shorter than predicted</option>
+                </select>
+            </div>
+
+            <div class="control-group" id="metric-group" style="display: none;">
+                <label for="metric-selector">Health Metric:</label>
+                <select id="metric-selector">
+                    <optgroup label="Health Outcomes">
+                        <option value="life_expectancy" selected>Life Expectancy</option>
+                        <option value="premature_death">Premature Death Rate</option>
+                        <option value="poor_health">Poor or Fair Health</option>
+                    </optgroup>
+                    <optgroup label="Health Behaviors">
+                        <option value="adult_obesity">Adult Obesity</option>
+                        <option value="adult_smoking">Adult Smoking</option>
+                        <option value="physical_inactivity">Physical Inactivity</option>
+                        <option value="diabetes">Diabetes Prevalence</option>
+                        <option value="excessive_drinking">Excessive Drinking</option>
+                    </optgroup>
+                    <optgroup label="Socioeconomic Factors">
+                        <option value="median_income">Median Household Income</option>
+                        <option value="hs_graduation">High School Graduation</option>
+                    </optgroup>
+                    <optgroup label="Clinical Care">
+                        <option value="uninsured">Uninsured Rate</option>
+                        <option value="primary_care_rate">Primary Care Physicians (per 100k)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <button id="reset-button" class="btn">Reset View</button>
+        </div>
+
+        <div id="visualization-container">
+            <div id="map-container">
+                <svg id="map-svg"></svg>
+            </div>
+            
+            <div id="info-panel">
+                <h3>County Details</h3>
+                <div id="county-info">
+                    <p><strong>Hover a county</strong> to compare its life expectancy with its prediction.</p>
+                    <p><strong>Click a county</strong> for its full profile and how it compares with counties at a similar income level.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="legend-container">
+            <svg id="legend-svg"></svg>
+        </div>
+
+        <section id="rankings" class="rankings-section">
+            <div id="model-summary" class="model-summary"></div>
+            <div class="rank-lists">
+                <div class="rank-card">
+                    <h3>Living longest beyond prediction</h3>
+                    <ol id="list-above" class="rank-list"></ol>
+                </div>
+                <div class="rank-card">
+                    <h3>Falling furthest short of prediction</h3>
+                    <ol id="list-below" class="rank-list"></ol>
+                </div>
+            </div>
+            <p class="caveat">Counties with very small populations have noisy life expectancy estimates, so treat the extremes of these lists with some caution. Click any county to open its profile.</p>
+        </section>
+
+        <!-- County Detail Modal -->
+        <div id="county-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="modal-close">&times;</span>
+                <h2 id="modal-county-name">County Name</h2>
+                <p id="modal-county-state">State</p>
+                
+                <div class="modal-year-control" style="display: none;">
+                    <label for="modal-year-slider">Explore Year:</label>
+                    <input type="range" id="modal-year-slider" min="2024" max="2024" value="2024" step="1">
+                    <span id="modal-year-display">2024</span>
+                </div>
+                
+                <div id="modal-deviation"></div>
+
+                <h3 class="modal-section-title">All metrics</h3>
+                <div id="modal-metrics-container">
+                    <!-- Metrics will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="writeup-section">
+                <h2>How the Prediction Works</h2>
+                <div class="writeup-content">
+                    <p>
+                        A gradient-boosting model predicts each county's life expectancy from three socioeconomic
+                        measures only: median household income, the share of residents without health insurance,
+                        and primary care physicians per 100,000 residents. Every county's prediction comes from a
+                        model trained on the <em>other</em> counties (5-fold cross-validation), so no county is scored
+                        by a model that has seen it.
+                    </p>
+                    <p>
+                        The map shows the gap between actual and predicted life expectancy. Counties more than two
+                        years above or below their prediction are labeled as living longer or shorter than predicted.
+                        Health behaviors such as smoking and physical inactivity are deliberately left out of the
+                        model; each county profile instead compares them with counties in the same income decile,
+                        which hints at <em>why</em> a county beats or misses its prediction. These comparisons are
+                        correlations, not causes.
+                    </p>
+                    <p id="model-footnote"></p>
+                </div>
+
+                <h2>Data Source</h2>
+                <div class="data-sources-content">
+                    <p>
+                        <strong><a href="https://www.countyhealthrankings.org/health-data" target="_blank">
+                        County Health Rankings & Roadmaps</a></strong> - 2025 Release (v3)
+                        <br><br>
+                        2024 health data for 3,159 U.S. counties covering health outcomes, health behaviors, 
+                        clinical care, and socioeconomic factors. A collaboration between the Robert Wood Johnson 
+                        Foundation and the University of Wisconsin Population Health Institute.
+                    </p>
+                </div>
+                <p class="byline">Built by Harsh Arya · <a href="https://github.com/aryaharsh5559/us-county-health-map" target="_blank">Source on GitHub</a></p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
